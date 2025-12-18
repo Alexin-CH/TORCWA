@@ -1,7 +1,6 @@
 import torch
 from math import pi
 
-from .torch_eig import Eig
 from .fields.source import _source_planewave, _source_fourier
 from .fields.xy import _field_xy
 from .fields.xz import _field_xz
