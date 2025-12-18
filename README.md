@@ -1,6 +1,6 @@
 # TORCWA
 
-***TORCHWA*** (**torc**h + **rcwa**) is a PyTorch implementation of rigorous coupled-wave analysis (RCWA)
+***TORCWA*** (**torc**h + **rcwa**) is a PyTorch implementation of rigorous coupled-wave analysis (RCWA)
 
 ## Table of Contents
 
