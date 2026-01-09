@@ -171,7 +171,7 @@ def _solve_global_smatrix(self):
 
     # Connection
     for i in range(self.layer_N - 1):
-        [S11, S21, S12, S22], C = self._RS_prod(
+        [S11, S21, S12, S22], C = self._rs_prod(
             Sm=[S11, S21, S12, S22],
             Sn=[
                 self.layer_S11[i + 1],
@@ -185,7 +185,7 @@ def _solve_global_smatrix(self):
 
     if hasattr(self, "Sin"):
         # input layer coupling
-        [S11, S21, S12, S22], C = self._RS_prod(
+        [S11, S21, S12, S22], C = self._rs_prod(
             Sm=[self.Sin[0], self.Sin[1], self.Sin[2], self.Sin[3]],
             Sn=[S11, S21, S12, S22],
             Cm=[[], []],
@@ -194,7 +194,7 @@ def _solve_global_smatrix(self):
 
     if hasattr(self, "Sout"):
         # output layer coupling
-        [S11, S21, S12, S22], C = self._RS_prod(
+        [S11, S21, S12, S22], C = self._rs_prod(
             Sm=[S11, S21, S12, S22],
             Sn=[self.Sout[0], self.Sout[1], self.Sout[2], self.Sout[3]],
             Cm=C,

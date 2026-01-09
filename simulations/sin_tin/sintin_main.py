@@ -25,9 +25,9 @@ def simulate_spectrum(wl_list, angle_deg=torch.tensor(30, device=device), order=
             ang=angle_deg,
             nh=order,
             discretization=2**12,
-            sin_period=torch.tensor(1000.0, device=device),
-            sin_amplitude=torch.tensor(55.0, device=device),
-            uni_layer_h=torch.tensor(50.0, device=device)
+            sin_period=torch.tensor(450.0, device=device),
+            sin_amplitude=torch.tensor(45.0, device=device),
+            uni_layer_h=torch.tensor(60.0, device=device)
         )
 
         # Setup and run simulation
@@ -35,28 +35,28 @@ def simulate_spectrum(wl_list, angle_deg=torch.tensor(30, device=device), order=
 
         # Get Reflextion and Transmission coefficients (order 0)
         for pol in ['xx', 'yx', 'xy', 'yy', 'pp', 'sp', 'ps', 'ss']:
-            RF0 = sim.S_parameters(
+            RF0 = sim.s_parameters(
                 orders=[0,0],
                 direction='f',
                 port='reflection',
                 polarization=pol,
                 ref_order=[0,0]
             )
-            RB0 = sim.S_parameters(
+            RB0 = sim.s_parameters(
                 orders=[0,0],
                 direction='b',  
                 port='reflection',
                 polarization=pol,
                 ref_order=[0,0]
             )
-            TF0 = sim.S_parameters(
+            TF0 = sim.s_parameters(
                 orders=[0,0],
                 direction='f',
                 port='transmission',
                 polarization=pol,
                 ref_order=[0,0]
             )
-            TB0 = sim.S_parameters(
+            TB0 = sim.s_parameters(
                 orders=[0,0],
                 direction='b',
                 port='transmission',
@@ -73,10 +73,10 @@ def simulate_spectrum(wl_list, angle_deg=torch.tensor(30, device=device), order=
             })
     return results, sim, args
 
-# Example: compute spectrum at 30° incidence
-wavelengths = torch.linspace(300., 2000., 20)
-inc_angle_deg = torch.tensor(30., device=device)
-results, sim, args = simulate_spectrum(wavelengths, angle_deg=inc_angle_deg, order=2)
+# Example: compute spectrum
+wavelengths = torch.linspace(400., 800., 100)
+inc_angle_deg = torch.tensor(25., device=device)
+results, sim, args = simulate_spectrum(wavelengths, angle_deg=inc_angle_deg, order=4)
 
 wavelengths = wavelengths.cpu().detach()  # Move to CPU for plotting
 

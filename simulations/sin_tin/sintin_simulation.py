@@ -53,55 +53,71 @@ def setup(
         geo_dtype: Data type for geometry tensors (default: torch.float32).
         device: Device to run the simulation on ('cpu' or 'cuda').
     """
-    # 3) Unit cell size (nm)
-    Lx = args.sin_period.cpu().detach().item()
-    Ly = args.sin_period.cpu().detach().item()
-    L = [Lx, Ly]
+    # Unit cell size (nm)
+    lx = args.sin_period.cpu().detach().item()
+    ly = args.sin_period.cpu().detach().item()
+    L = [lx, ly]
 
     torcwa.rcwa_geo.dtype = geo_dtype
     torcwa.rcwa_geo.device = device
-    torcwa.rcwa_geo.Lx = Lx
-    torcwa.rcwa_geo.Ly = Ly
+    torcwa.rcwa_geo.Lx = lx
+    torcwa.rcwa_geo.Ly = ly
     torcwa.rcwa_geo.nx = args.discretization
     torcwa.rcwa_geo.ny = args.discretization
     torcwa.rcwa_geo.grid()
 
-    # 4) Materials
+    # Materials
     eps_air   = torch.tensor(1.0, dtype=sim_dtype, device=device)
     n_sub     = 1.5
     eps_sub   = torch.tensor(n_sub**2, dtype=sim_dtype, device=device)
+
+    index_dataset = "labo"
     
-    TiN_RefIdx = pd.read_csv(f"{root_dir}/example/TiN-RefIdx-Beliaev-sputtering.csv").astype(float)
-    n = np.interp(
-        args.wl.cpu().detach().numpy() / 1000.0,
-        TiN_RefIdx['wl (microm)'].values,
-        TiN_RefIdx['n'].values
-    )
-    k = np.interp(
-        args.wl.cpu().detach().numpy() / 1000.0,
-        TiN_RefIdx['wl (microm)'].values,
-        TiN_RefIdx['k'].values
-    )
+    # Beliaev-sputtering or labo
+    if index_dataset == "beliaev":
+        tin_ref_idx = pd.read_csv(f"{root_dir}/simulations/sin_tin/TiN-RefIdx-beliaev.csv").astype(float)
+        n = np.interp(
+            args.wl.cpu().detach().numpy() / 1000.0,
+            tin_ref_idx['wl (microm)'].values,
+            tin_ref_idx['n'].values
+        )
+        k = np.interp(
+            args.wl.cpu().detach().numpy() / 1000.0,
+            tin_ref_idx['wl (microm)'].values,
+            tin_ref_idx['k'].values
+        )
+    elif index_dataset == "labo":
+        tin_ref_idx = pd.read_csv(f"{root_dir}/simulations/sin_tin/TiN-RefIdx-labo.csv").astype(float)
+        n = np.interp(
+            args.wl.cpu().detach().numpy(),
+            tin_ref_idx['wl (nm)'].values,
+            tin_ref_idx['n'].values
+        )
+        k = np.interp(
+            args.wl.cpu().detach().numpy(),
+            tin_ref_idx['wl (nm)'].values,
+            tin_ref_idx['k'].values
+        )
 
     eps = (n**2 - k**2) + 1j*(2*n*k)
     # print(f"At λ={args.wl.item():.1f} nm, TiN n={n:.3f}, k={k:.3f}, ε={eps:.3f}")
     eps_metal = torch.tensor(eps, dtype=sim_dtype, device=device)
 
-    # 5) Sinusoidal corrugation parameters
+    # Sinusoidal corrugation parameters
     amplitude  = args.sin_amplitude  # nm
     period     = args.sin_period    # nm
-    num_layers = 30
+    num_layers = 40
     dz         = (2 * amplitude) / num_layers
 
-    # 6) z‐axis and central x‐slice index
+    # z‐axis and central x‐slice index
     zmax = 1000.0  # nm
     z = torch.linspace(-zmax, zmax, 500, device=device)
     nz = z.numel()
-    x_slice = 0.5 * Lx
-    x_idx = torch.argmin(torch.abs(torcwa.rcwa_geo.x - x_slice)).item()
+    x_slice = 0.5 * lx
+    x_idx = torch.argmin(torch.abs(torcwa.rcwa_geo.x - x_slice), dim=0).item()
 
     # Precompute height profile h(x,y)
-    X, Y = torch.meshgrid(
+    X, _ = torch.meshgrid(
         torcwa.rcwa_geo.x,
         torcwa.rcwa_geo.y,
         indexing="xy"
@@ -117,7 +133,7 @@ def setup(
     sim = torcwa.rcwa(
         freq=freq,
         order=[0, args.nh],
-        L=L,
+        lattice=L,
         dtype=sim_dtype,
         device=device
     )
@@ -187,9 +203,9 @@ def get_diffraction_angles(torcwa_simulation):
         )
         inc_angles.append(inc_angle)
         azi_angles.append(azi_angle)
-    return torch.unique(inc_angles), torch.unique(azi_angles)
+    return torch.unique(inc_angles, dim=0), torch.unique(azi_angles, dim=0)
 
-def get_S_parameters(torcwa_simulation):
+def get_s_parameters(torcwa_simulation):
     params = {}
     for d in ['forward', 'backward']:
         for port in ['transmission', 'reflection']:
