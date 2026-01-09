@@ -44,3 +44,9 @@ make
 ## Usage
 
 Main script is located in the `src` directory.
+
+## Compute time vs number of orders
+
+To evaluate the compute time as a function of the number of orders, run `src/eval_orders.py`.
+
+![eval_orders](assets/time_vs_orders.png)
