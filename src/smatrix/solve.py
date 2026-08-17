@@ -183,7 +183,7 @@ def _solve_global_smatrix(self):
             Cn=[[self.Cf[i + 1]], [self.Cb[i + 1]]],
         )
 
-    if hasattr(self, "Sin"):
+    if hasattr(self, "Sin") and len(self.Sin) > 0:
         # input layer coupling
         [S11, S21, S12, S22], C = self._rs_prod(
             Sm=[self.Sin[0], self.Sin[1], self.Sin[2], self.Sin[3]],
@@ -192,7 +192,7 @@ def _solve_global_smatrix(self):
             Cn=C,
         )
 
-    if hasattr(self, "Sout"):
+    if hasattr(self, "Sout") and len(self.Sout) > 0:
         # output layer coupling
         [S11, S21, S12, S22], C = self._rs_prod(
             Sm=[S11, S21, S12, S22],
