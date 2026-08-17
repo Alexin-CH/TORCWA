@@ -31,7 +31,7 @@ def eval_orders(order_list, device='cpu'):
             uni_layer_h=0.0
         )
         sim, _  = setup(args=args, device = device)
-        sim.solve_global_smatrix()
+        sim.solve()
         # Get Reflextion and Transmission coefficients for all polarizations
         R_pol = []
         T_pol = []

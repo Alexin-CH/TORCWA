@@ -2,7 +2,7 @@
 S-matrix solving mixin - delegates to implementation functions
 """
 
-from ..smatrix.solve import _solve_global_smatrix, _solve_layer_smatrix
+from ..smatrix.solve import _solve, _solve_global_smatrix, _solve_layer_smatrix
 from ..smatrix.rsprod import _RS_prod
 from ..smatrix.sparameters import _S_parameters
 
@@ -12,6 +12,7 @@ class SMatrixMixin:
     Mixin providing S-matrix solving functionality.
     
     Public methods:
+    - solve: Solve the global scattering matrix (validates setup ordering)
     - solve_global_smatrix:  Solve the global scattering matrix
     - S_parameters: Calculate S-parameters for specified diffraction orders
     
@@ -21,6 +22,7 @@ class SMatrixMixin:
     """
     
     # Public API
+    solve = _solve
     solve_global_smatrix = _solve_global_smatrix
     s_parameters = _S_parameters
     

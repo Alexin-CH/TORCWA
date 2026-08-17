@@ -203,3 +203,27 @@ def _solve_global_smatrix(self):
 
     self.S = [S11, S21, S12, S22]
     self.C = C
+
+def _solve(self):
+    """
+    Solve the global S-matrix after validating the simulation setup.
+
+    Convenience wrapper around solve_global_smatrix that enforces the
+    required setup ordering:
+      1. set_incident_angle     (defines Kx_norm / Kx_norm_dn)
+      2. add_layer / add_input_layer / add_output_layer
+      3. source_planewave / source_fourier  (defines E_i)
+
+    Returns self for chaining.
+    """
+
+    if not hasattr(self, "Kx_norm"):
+        raise RuntimeError(
+            "set_incident_angle() must be called before solve()."
+        )
+    if not hasattr(self, "E_i"):
+        raise RuntimeError(
+            "A light source (source_planewave/source_fourier) must be set before solve()."
+        )
+    self.solve_global_smatrix()
+    return self

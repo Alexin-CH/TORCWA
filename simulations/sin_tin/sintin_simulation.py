@@ -187,7 +187,7 @@ def setup(
     perm_map[mask_sub, :] = eps_sub
 
     # Solve S‐matrix and compute reflectance/transmittance
-    sim.solve_global_smatrix()
+    sim.solve()
 
     return sim, perm_map
 
