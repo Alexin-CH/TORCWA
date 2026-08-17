@@ -3,7 +3,7 @@ import math
 import pytest
 import torch
 
-import src as torcwa
+import torcwa
 
 
 def _solve(freq, order, layer_eps, thickness, dtype=torch.complex64):

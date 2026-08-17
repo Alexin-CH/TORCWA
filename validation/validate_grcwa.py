@@ -26,7 +26,7 @@ import numpy as np
 import torch
 
 import grcwa
-import src as torcwa
+import torcwa
 
 L = 1000.0  # nm, lattice constant for all cases
 TOL = 1e-4  # PASS tolerance (TORCWA runs in complex64)

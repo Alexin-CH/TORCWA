@@ -1,6 +1,6 @@
 import torch
 
-import src as torcwa
+import torcwa
 
 
 def test_gradient_flows_wrt_wavelength(build_sim):

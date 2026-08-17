@@ -8,7 +8,7 @@ import torch
 import pandas as pd
 import numpy as np
 
-import src as torcwa
+import torcwa
 
 
 class RCWAArgs:

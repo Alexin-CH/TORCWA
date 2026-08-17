@@ -56,7 +56,7 @@ Import the package and build a simulation. The setup order is:
 
 ```python
 import torch
-import src as torcwa
+import torcwa
 
 # Wavelength 800 nm, 3x3 diffraction orders, 1000 nm lattice
 sim = torcwa.rcwa(
@@ -96,10 +96,10 @@ Supported polarizations for `s_parameters`: xy-notation `'xx'`, `'yx'`, `'xy'`,
 
 ## Compute time vs number of orders
 
-To evaluate the compute time as a function of the number of orders, run `src/eval_orders.py` as a script:
+To evaluate the compute time as a function of the number of orders, run `torcwa/eval_orders.py` as a script:
 
 ```bash
-python src/eval_orders.py
+python torcwa/eval_orders.py
 ```
 
 ![eval_orders](assets/time_vs_orders.png)

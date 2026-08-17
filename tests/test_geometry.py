@@ -1,6 +1,6 @@
 import torch
 
-import src as torcwa
+import torcwa
 
 
 def test_geometry_circle():
