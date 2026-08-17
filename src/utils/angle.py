@@ -2,6 +2,8 @@ import torch
 from math import pi
 
 def _matching_indices(self, orders):
+    orders = torch.as_tensor(orders, dtype=torch.int64, device=self._device)
+    orders = orders.reshape([-1, 2]).clone()
     orders[orders[:, 0] < -self.order[0], 0] = int(-self.order[0])
     orders[orders[:, 0] > self.order[0], 0] = int(self.order[0])
     orders[orders[:, 1] < -self.order[1], 1] = int(-self.order[1])

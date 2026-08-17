@@ -17,6 +17,22 @@ def test_matching_indices_clamps_out_of_range(build_sim):
     assert idx.tolist() == [6, 2]
 
 
+def test_matching_indices_does_not_mutate_input(build_sim):
+    # Regression: _matching_indices used to clamp orders in place, corrupting
+    # the caller's tensor (torch.as_tensor does not copy).
+    sim = build_sim(order=(1, 1))
+    orders = torch.tensor([[5, -5]], dtype=torch.int64)
+    orders_orig = orders.clone()
+    sim._matching_indices(orders)
+    assert torch.equal(orders, orders_orig)
+
+
+def test_matching_indices_accepts_python_list(build_sim):
+    sim = build_sim(order=(1, 1))
+    idx = sim._matching_indices([[0, 0]])
+    assert idx.tolist() == [4]
+
+
 def test_diffraction_angle_degree(build_sim, solved_sim):
     # Regression: unit="degree" used to raise NameError because `pi` was not imported.
     sim = solved_sim(order=(1, 1), inc_ang=30.0)
