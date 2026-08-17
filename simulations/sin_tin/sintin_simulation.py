@@ -1,7 +1,7 @@
 import os
 import sys
 
-root_dir = os.getcwd().split("TORCWA")[0] + "TORCWA"
+root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(root_dir)
 
 import torch
@@ -23,12 +23,12 @@ class RCWAArgs:
         sin_period,
         uni_layer_h
         ):
-        self.wl = wl.requires_grad_()
-        self.ang = ang.requires_grad_()
+        self.wl = torch.as_tensor(wl, dtype=torch.float64).requires_grad_()
+        self.ang = torch.as_tensor(ang, dtype=torch.float64).requires_grad_()
         self.nh = nh
         self.discretization = discretization
-        self.sin_amplitude = sin_amplitude.requires_grad_()
-        self.sin_period = sin_period.requires_grad_()
+        self.sin_amplitude = torch.as_tensor(sin_amplitude, dtype=torch.float64).requires_grad_()
+        self.sin_period = torch.as_tensor(sin_period, dtype=torch.float64).requires_grad_()
         self.uni_layer_h = uni_layer_h
 
 def setup(
@@ -210,12 +210,12 @@ def get_s_parameters(torcwa_simulation):
     for d in ['forward', 'backward']:
         for port in ['transmission', 'reflection']:
             for pol in ['xx', 'yx', 'xy', 'yy', 'pp', 'sp', 'ps', 'ss']:
-                s_param = torcwa_simulation.S_parameters(
+                s_param = torcwa_simulation.s_parameters(
                     orders=[0, 0],
-                    direction='forward',
-                    port='transmission',
-                    polarization='xx',
-                    ref_order=[0,0],
+                    direction=d,
+                    port=port,
+                    polarization=pol,
+                    ref_order=[0, 0],
                     power_norm=True,
                     evanscent=1e-3
                 )

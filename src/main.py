@@ -63,7 +63,6 @@ class rcwa(LayerMixin, FieldMixin, SMatrixMixin, UtilsMixin):
             freq, dtype=self._dtype, device=self._device
         )  # unit^-1
         self.omega = 2 * pi * freq  # same as k0a
-        self.L = torch.as_tensor(lattice, dtype=self._dtype, device=self._device)
 
         # Fourier order
         self.order = order

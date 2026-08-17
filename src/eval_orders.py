@@ -1,11 +1,16 @@
 # Python script: RCWA simulation of a layered metasurface using TORCWA
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import time
 import torch
 import numpy as np
 from matplotlib import pyplot as plt
 from tqdm import tqdm
 
-from rcwa import setup, RCWAArgs
+from simulations.sin_tin.sintin_simulation import setup, RCWAArgs
 
 def eval_orders(order_list, device='cpu'):
     """Compute reflection and transmission spectra over wavelengths at a given angle."""
@@ -22,7 +27,8 @@ def eval_orders(order_list, device='cpu'):
             nh=order,
             discretization=256,
             sin_amplitude=55.0,
-            sin_period=1000.0
+            sin_period=1000.0,
+            uni_layer_h=0.0
         )
         sim, _  = setup(args=args, device = device)
         sim.solve_global_smatrix()
@@ -30,9 +36,9 @@ def eval_orders(order_list, device='cpu'):
         R_pol = []
         T_pol = []
         for pol in ['xx', 'yx', 'xy', 'yy', 'pp', 'sp', 'ps', 'ss']:
-            R0 = sim.S_parameters(orders=[0,0], direction='forward',
+            R0 = sim.s_parameters(orders=[0,0], direction='forward',
                                 port='reflection', polarization=pol, ref_order=[0,0])
-            T0 = sim.S_parameters(orders=[0,0], direction='forward',
+            T0 = sim.s_parameters(orders=[0,0], direction='forward',
                                 port='transmission', polarization=pol, ref_order=[0,0])
             R_pol.append(abs(R0.cpu())**2)
             T_pol.append(abs(T0.cpu())**2)

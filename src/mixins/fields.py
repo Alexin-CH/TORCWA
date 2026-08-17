@@ -1,10 +1,10 @@
 """
 Field calculation mixin - delegates to implementation functions
 """
-from .. fields.source import _source_planewave, _source_fourier
+from ..fields.source import _source_planewave, _source_fourier
 from ..fields.xy import _field_xy
 from ..fields.xz import _field_xz
-from ..fields. yz import _field_yz
+from ..fields.yz import _field_yz
 
 
 class FieldMixin:

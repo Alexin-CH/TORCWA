@@ -70,7 +70,7 @@ def _add_layer(self, thickness, eps=1.0, mu=1.0):
     )
     is_mu_homogenous = (
         isinstance(mu, float)
-        or isinstance(mu, float)
+        or isinstance(mu, complex)
         or (mu.dim() == 0)
         or ((mu.dim() == 1) and mu.shape[0] == 1)
     )

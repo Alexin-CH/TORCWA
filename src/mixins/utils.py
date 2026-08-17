@@ -2,8 +2,8 @@
 Utility functions mixin - delegates to implementation functions
 """
 
-from .. utils.angle import _set_incident_angle, _matching_indices, _diffraction_angle
-from .. utils.eigen_decomposition import _eigen_decomposition, _eigen_decomposition_homogenous
+from ..utils.angle import _set_incident_angle, _matching_indices, _diffraction_angle
+from ..utils.eigen_decomposition import _eigen_decomposition, _eigen_decomposition_homogenous
 from ..utils.kvectors import _kvectors
 
 

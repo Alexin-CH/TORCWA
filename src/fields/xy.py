@@ -47,8 +47,8 @@ def _field_xy(self, layer_num, x_axis, y_axis, z_prop=0.0):
             ).reshape([-1, 1])
         elif layer_num == self.layer_N:
             z_prop = z_prop if z_prop >= 0.0 else 0.0
-            eps = self.eps_out if hasattr(self, "eps_in") else 1.0
-            mu = self.mu_out if hasattr(self, "mu_in") else 1.0
+            eps = self.eps_out if hasattr(self, "eps_out") else 1.0
+            mu = self.mu_out if hasattr(self, "mu_out") else 1.0
             Vo = self.Vo if hasattr(self, "Vo") else self.Vf
             Kz_norm_dn = torch.sqrt(eps * mu - Kx_norm_dn**2 - Ky_norm_dn**2)
             Kz_norm_dn = torch.where(

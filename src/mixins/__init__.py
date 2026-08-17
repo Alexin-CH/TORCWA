@@ -11,6 +11,6 @@ Each mixin groups related functionality:
 from .layers import LayerMixin
 from .fields import FieldMixin
 from .smatrix import SMatrixMixin
-from . utils import UtilsMixin
+from .utils import UtilsMixin
 
 __all__ = ['LayerMixin', 'FieldMixin', 'SMatrixMixin', 'UtilsMixin']
