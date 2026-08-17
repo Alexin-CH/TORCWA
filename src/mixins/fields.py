@@ -9,10 +9,16 @@ from ..fields.yz import _field_yz
 
 class FieldMixin:
     """
-    Mixin for electromagnetic field calculations. 
-    Implementation is in src/fields/ modules.
+    Mixin for electromagnetic field calculations.
+
+    Public methods:
+    - source_planewave: Set the incident field from a plane wave
+    - source_fourier: Set the incident field from Fourier amplitudes
+    - field_xy: XY-plane field distribution at a given z position
+    - field_xz: XZ-plane field distribution at a given y position
+    - field_yz: YZ-plane field distribution at a given x position
     """
-    
+
     # Direct assignment - no code duplication
     source_planewave = _source_planewave
     source_fourier = _source_fourier
