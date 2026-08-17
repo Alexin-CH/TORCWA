@@ -16,7 +16,17 @@ def test_lattice_is_preserved(build_sim):
 def test_freq_and_omega(build_sim):
     sim = build_sim(freq=1.0 / 800.0)
     assert torch.isclose(sim.freq, torch.tensor(1.0 / 800.0, dtype=sim._dtype))
-    assert math.isclose(sim.omega, 2 * math.pi / 800.0, rel_tol=1e-6)
+    assert torch.isclose(sim.omega, torch.tensor(2 * math.pi / 800.0, dtype=sim._dtype))
+    assert sim.omega.dtype == sim._dtype
+
+
+def test_omega_dtype_consistent_with_tensor_freq(build_sim):
+    # Regression: when freq was passed as a tensor, omega stayed a float64
+    # tensor which silently promoted the phase computations to complex128.
+    freq = torch.tensor(1.0 / 800.0)
+    sim = build_sim(freq=freq)
+    assert sim.omega.dtype == sim._dtype
+    assert torch.isclose(sim.omega, torch.tensor(2 * math.pi / 800.0, dtype=sim._dtype))
 
 
 def test_order_N(build_sim):
