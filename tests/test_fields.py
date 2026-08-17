@@ -48,6 +48,51 @@ def test_field_yz_shape(solved_sim):
         assert torch.isfinite(f).all()
 
 
+def test_field_xz_region_batching_invariant(solved_sim):
+    # Regression: computing the field for a z_axis split into chunks must give
+    # identical columns to a single call (vectorized per-region computation).
+    # Tolerance allows for float32 rounding differences across batch sizes;
+    # the pre-fix column-interleaving bug produced O(1) errors.
+    sim = solved_sim(order=(1, 1), inc_ang=30.0)
+    x = torch.linspace(-500, 500, 8)
+    z_full = torch.linspace(-200, 220, 30)
+    split = 15
+    (E, H) = sim.field_xz(x, z_full, y=0.0)
+    (Ea, Ha) = sim.field_xz(x, z_full[:split], y=0.0)
+    (Eb, Hb) = sim.field_xz(x, z_full[split:], y=0.0)
+    for f, a, b in zip(E + H, Ea + Ha, Eb + Hb):
+        assert torch.allclose(f[:, :split], a, rtol=1e-5, atol=1e-5)
+        assert torch.allclose(f[:, split:], b, rtol=1e-5, atol=1e-5)
+
+
+def test_field_yz_region_batching_invariant(solved_sim):
+    sim = solved_sim(order=(1, 1), inc_ang=30.0)
+    y = torch.linspace(-500, 500, 8)
+    z_full = torch.linspace(-200, 220, 30)
+    split = 15
+    (E, H) = sim.field_yz(y, z_full, x=0.0)
+    (Ea, Ha) = sim.field_yz(y, z_full[:split], x=0.0)
+    (Eb, Hb) = sim.field_yz(y, z_full[split:], x=0.0)
+    for f, a, b in zip(E + H, Ea + Ha, Eb + Hb):
+        assert torch.allclose(f[:, :split], a, rtol=1e-5, atol=1e-5)
+        assert torch.allclose(f[:, split:], b, rtol=1e-5, atol=1e-5)
+
+
+def test_field_xz_unsorted_z_preserves_order(solved_sim):
+    # The field at each z is well-defined; reordering the input z_axis must only
+    # reorder the output columns.
+    sim = solved_sim(order=(1, 1), inc_ang=30.0)
+    x = torch.linspace(-500, 500, 8)
+    z = torch.tensor([150.0, -100.0, 50.0, -50.0, 120.0])
+    order = torch.argsort(z)
+    (E, H) = sim.field_xz(x, z, y=0.0)
+    (Es, Hs) = sim.field_xz(x, torch.sort(z).values, y=0.0)
+    for f, fs in zip(E + H, Es + Hs):
+        reordered = torch.empty_like(f)
+        reordered[:, order] = fs
+        assert torch.equal(f, reordered)
+
+
 def test_field_xz_backward_source(solved_sim):
     sim = solved_sim(order=(1, 1), inc_ang=30.0)
     sim.source_fourier(amplitude=[1.0, 0.0], orders=[[0, 0]], direction="b", notation="xy")
