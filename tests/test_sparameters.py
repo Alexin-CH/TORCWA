@@ -95,3 +95,23 @@ def test_power_norm_false_returns_raw_amplitude(solved_sim):
                               polarization="xx", power_norm=True)
     assert torch.isfinite(raw)
     assert torch.isfinite(normed)
+
+
+def test_grazing_diffraction_order_no_nan(build_sim):
+    # Regression: wl=1500nm, period=1000nm, 30deg incidence puts order (-1,0)
+    # exactly at grazing (kx^2+ky^2 == n^2, kz == 0), which made the E->H
+    # transformation matrices singular (0/0 -> NaN).
+    sim = build_sim(freq=1.0 / 1500.0, order=(1, 1))
+    sim.add_input_layer(eps=1.0)
+    sim.add_output_layer(eps=1.0)
+    sim.set_incident_angle(inc_ang=30.0 * torch.pi / 180, azi_ang=0.0)
+    assert torch.isfinite(sim.Vf).all(), "free-space E->H matrix is NaN"
+    assert torch.isfinite(sim.Vi).all(), "input-layer E->H matrix is NaN"
+    assert torch.isfinite(sim.Sin[0]).all(), "input-layer S-matrix is NaN"
+
+    sim.add_layer(thickness=100.0, eps=2.25, mu=1.0)
+    sim.source_planewave(amplitude=[1.0, 0.0], direction="f")
+    sim.solve_global_smatrix()
+    s = sim.s_parameters(orders=[0, 0], direction="forward", port="transmission",
+                         polarization="xx", power_norm=True)
+    assert torch.isfinite(s)

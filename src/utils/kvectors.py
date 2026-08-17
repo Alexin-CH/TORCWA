@@ -1,5 +1,26 @@
 import torch
 
+def _kz_regularized(nk0_norm2, Kx_norm_dn, Ky_norm_dn, min_abs=1e-6):
+    """
+    Normalized kz = sqrt(n^2 - kx^2 - ky^2) with the positive-imaginary
+    branch convention and a floor on |kz|.
+
+    An exactly grazing diffraction order (kx^2 + ky^2 == n^2) yields kz = 0,
+    which makes the E->H transformation matrices in _kvectors singular
+    (0/0 -> NaN). Clamping |kz| to a small value keeps the matrices finite
+    while perturbing that order's contribution negligibly.
+    """
+    Kz_norm_dn = torch.sqrt(nk0_norm2 - Kx_norm_dn**2 - Ky_norm_dn**2)
+    Kz_norm_dn = torch.where(
+        torch.imag(Kz_norm_dn) < 0, torch.conj(Kz_norm_dn), Kz_norm_dn
+    )
+    Kz_norm_dn = torch.where(
+        torch.abs(Kz_norm_dn) < min_abs,
+        torch.ones_like(Kz_norm_dn) * min_abs,
+        Kz_norm_dn,
+    )
+    return Kz_norm_dn
+
 def _kvectors(self):
     if self.angle_layer == "input":
         self.kx0_norm = (
@@ -37,10 +58,7 @@ def _kvectors(self):
     self.Kx_norm = torch.diag(self.Kx_norm_dn)
     self.Ky_norm = torch.diag(self.Ky_norm_dn)
 
-    Kz_norm_dn = torch.sqrt(1.0 - self.Kx_norm_dn**2 - self.Ky_norm_dn**2)
-    Kz_norm_dn = torch.where(
-        torch.imag(Kz_norm_dn) < 0, torch.conj(Kz_norm_dn), Kz_norm_dn
-    )
+    Kz_norm_dn = _kz_regularized(1.0, self.Kx_norm_dn, self.Ky_norm_dn)
     tmp1 = torch.vstack(
         (
             torch.diag(-self.Ky_norm_dn * self.Kx_norm_dn / Kz_norm_dn),
@@ -57,11 +75,8 @@ def _kvectors(self):
 
     if hasattr(self, "Sin"):
         # Input layer k-vectors and E to H transformation matrix
-        Kz_norm_dn = torch.sqrt(
-            self.eps_in * self.mu_in - self.Kx_norm_dn**2 - self.Ky_norm_dn**2
-        )
-        Kz_norm_dn = torch.where(
-            torch.imag(Kz_norm_dn) < 0, torch.conj(Kz_norm_dn), Kz_norm_dn
+        Kz_norm_dn = _kz_regularized(
+            self.eps_in * self.mu_in, self.Kx_norm_dn, self.Ky_norm_dn
         )
         tmp1 = torch.vstack(
             (
@@ -88,11 +103,8 @@ def _kvectors(self):
 
     if hasattr(self, "Sout"):
         # Output layer k-vectors and E to H transformation matrix
-        Kz_norm_dn = torch.sqrt(
-            self.eps_out * self.mu_out - self.Kx_norm_dn**2 - self.Ky_norm_dn**2
-        )
-        Kz_norm_dn = torch.where(
-            torch.imag(Kz_norm_dn) < 0, torch.conj(Kz_norm_dn), Kz_norm_dn
+        Kz_norm_dn = _kz_regularized(
+            self.eps_out * self.mu_out, self.Kx_norm_dn, self.Ky_norm_dn
         )
         tmp1 = torch.vstack(
             (
