@@ -10,9 +10,10 @@ all: install
 $(VENV_DIR):
 	$(PYTHON) -m venv $(VENV_DIR)
 
-# Install requirements
+# Install requirements and the torcwa package
 install: $(VENV_DIR)
 	$(PIP) install -r requirements.txt
+	$(PIP) install -e .
 
 # Remove the virtual environment
 clean:
