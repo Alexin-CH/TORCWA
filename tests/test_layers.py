@@ -35,6 +35,17 @@ def test_add_patterned_layer(build_sim):
     assert sim.eps_conv[0].shape == (sim.order_N, sim.order_N)
 
 
+def test_add_homogeneous_int_eps_mu(build_sim):
+    # Regression: int eps/mu used to crash because .dim() was called on a
+    # python int that was neither float nor complex.
+    sim = build_sim()
+    sim.set_incident_angle(inc_ang=0.0, azi_ang=0.0)
+    sim.add_layer(thickness=50.0, eps=1, mu=1)
+    assert sim.layer_N == 1
+    assert torch.allclose(sim.eps_conv[0], torch.eye(sim.order_N, dtype=sim._dtype))
+    assert torch.allclose(sim.mu_conv[0], torch.eye(sim.order_N, dtype=sim._dtype))
+
+
 def test_add_input_output_layer(build_sim):
     sim = build_sim()
     sim.add_input_layer(eps=2.25)

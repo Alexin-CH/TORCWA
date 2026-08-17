@@ -62,17 +62,11 @@ def _add_layer(self, thickness, eps=1.0, mu=1.0):
     - mu: relative permeability
     """
 
-    is_eps_homogenous = (
-        isinstance(eps, float)
-        or isinstance(eps, complex)
-        or (eps.dim() == 0)
-        or ((eps.dim() == 1) and eps.shape[0] == 1)
+    is_eps_homogenous = isinstance(eps, (int, float, complex)) or (
+        isinstance(eps, torch.Tensor) and eps.numel() == 1
     )
-    is_mu_homogenous = (
-        isinstance(mu, float)
-        or isinstance(mu, complex)
-        or (mu.dim() == 0)
-        or ((mu.dim() == 1) and mu.shape[0] == 1)
+    is_mu_homogenous = isinstance(mu, (int, float, complex)) or (
+        isinstance(mu, torch.Tensor) and mu.numel() == 1
     )
 
     self.eps_conv.append(
