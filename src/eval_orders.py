@@ -49,45 +49,46 @@ def eval_orders(order_list, device='cpu'):
 
 
 # Main evaluation loop
-devices = ['cpu'] + (['cuda'] if torch.cuda.is_available() else [])
-n_avg = 5  # Number of averages for timing
+if __name__ == "__main__":
+    devices = ['cpu'] + (['cuda'] if torch.cuda.is_available() else [])
+    n_avg = 5  # Number of averages for timing
 
-print(f"Available devices: {devices}")
-print(f"Number of averages for timing: {n_avg}")
+    print(f"Available devices: {devices}")
+    print(f"Number of averages for timing: {n_avg}")
 
-times = {}
-for device in devices:
-    print(f"\nEvaluating on device: {device}")
-    orders = np.arange(0, 40)
+    times = {}
+    for device in devices:
+        print(f"\nEvaluating on device: {device}")
+        orders = np.arange(0, 40)
 
-    # Repeat each measurement 3 times and average
-    times[device] = []
-    for _ in range(n_avg):
-        R_spec, T_spec, exec_time = eval_orders(orders, device=device)
-        times[device].append(exec_time)
-    
-    times[device] = np.mean(times[device], axis=0)
+        # Repeat each measurement 3 times and average
+        times[device] = []
+        for _ in range(n_avg):
+            R_spec, T_spec, exec_time = eval_orders(orders, device=device)
+            times[device].append(exec_time)
 
-# Plot computation times[device] for each order
-plt.figure(figsize=(6,4))
-for device in devices:
-    plt.plot(orders, times[device], marker='o', label=device)
-plt.title("Computation Time vs Order")
-plt.xlabel("Order")
-plt.ylabel("Time (seconds)")
-plt.legend()
-plt.grid()
-plt.show()
+        times[device] = np.mean(times[device], axis=0)
 
-# Plot reflection and transmission vs wavelength
-for idx, pol in enumerate(['xx', 'yx', 'xy', 'yy', 'pp', 'sp', 'ps', 'ss']):
+    # Plot computation times[device] for each order
     plt.figure(figsize=(6,4))
-    plt.plot(orders, R_spec[:, idx], label='Reflection (R)')
-    plt.plot(orders, T_spec[:, idx], label='Transmission (T)')
-    plt.title(f"Reflectance and Transmittance at {pol} polarization")
+    for device in devices:
+        plt.plot(orders, times[device], marker='o', label=device)
+    plt.title("Computation Time vs Order")
     plt.xlabel("Order")
-    plt.ylabel("Efficiency")
+    plt.ylabel("Time (seconds)")
     plt.legend()
     plt.grid()
-    # plt.savefig(f"{pol}pol_vs_orders.png", dpi=300)
     plt.show()
+
+    # Plot reflection and transmission vs wavelength
+    for idx, pol in enumerate(['xx', 'yx', 'xy', 'yy', 'pp', 'sp', 'ps', 'ss']):
+        plt.figure(figsize=(6,4))
+        plt.plot(orders, R_spec[:, idx], label='Reflection (R)')
+        plt.plot(orders, T_spec[:, idx], label='Transmission (T)')
+        plt.title(f"Reflectance and Transmittance at {pol} polarization")
+        plt.xlabel("Order")
+        plt.ylabel("Efficiency")
+        plt.legend()
+        plt.grid()
+        # plt.savefig(f"{pol}pol_vs_orders.png", dpi=300)
+        plt.show()

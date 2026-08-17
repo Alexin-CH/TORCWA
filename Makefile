@@ -18,4 +18,8 @@ install: $(VENV_DIR)
 clean:
 	rm -rf $(VENV_DIR)
 
-.PHONY: all install clean
+# Run the test suite (requires pytest in the active environment)
+test:
+	$(PYTHON) -m pytest tests/ -q
+
+.PHONY: all install clean test
