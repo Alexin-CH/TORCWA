@@ -1,8 +1,10 @@
 # External reference validation
 
 `validate_grcwa.py` validates the TORCWA RCWA implementation against an
-independent external solver, **grcwa** (Green's function RCWA by Minsook Lee,
-MIT license, <https://github.com/MinsooLee/grcwa>).
+independent external solver, **grcwa** (autoGradable RCWA by Weiliang Jin,
+GPL-2.0, <https://github.com/weiliangjinca/grcwa>). It was published in
+Jin, Li, Orenstein and Fan, *Inverse design of lightweight broadband reflector
+for relativistic lightsail propulsion*, ACS Photonics 7(9), 2350-2355 (2020).
 
 grcwa is a separate, pure-Python RCWA implementation. Agreement between the two
 solvers therefore catches formulation, convention, and sign errors that a
